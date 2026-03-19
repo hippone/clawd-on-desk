@@ -1096,12 +1096,17 @@ function exitMiniMode() {
     clamped.x = wa.x + wa.width - size.width + mRight - 100;
   }
 
+  // Clear any lingering mini state timers
+  if (autoReturnTimer) { clearTimeout(autoReturnTimer); autoReturnTimer = null; }
+  if (pendingTimer) { clearTimeout(pendingTimer); pendingTimer = null; pendingState = null; }
+
   animateWindowParabola(clamped.x, clamped.y, JUMP_DURATION, () => {
+    // Use applyState directly — bypass MIN_DISPLAY_MS so mini animations don't linger
     if (doNotDisturb) {
       applyState("sleeping");
     } else {
       const resolved = resolveDisplayState();
-      setState(resolved, getSvgOverride(resolved));
+      applyState(resolved, getSvgOverride(resolved));
     }
   });
 }
